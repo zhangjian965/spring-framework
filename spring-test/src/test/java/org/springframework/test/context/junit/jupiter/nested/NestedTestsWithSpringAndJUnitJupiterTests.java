@@ -22,6 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.NestedTestConfiguration;
+import org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration;
 import org.springframework.test.context.junit.SpringJUnitJupiterTestSuite;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -77,6 +79,7 @@ class NestedTestsWithSpringAndJUnitJupiterTests {
 
 	@Nested
 	// @SpringJUnitConfig(NestedConfig.class)
+	@NestedTestConfiguration(EnclosingConfiguration.INHERIT)
 	class NestedTestCaseWithInheritedConfigTests {
 
 		@Autowired

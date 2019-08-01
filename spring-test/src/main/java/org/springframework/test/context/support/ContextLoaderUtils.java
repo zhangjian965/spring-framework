@@ -16,7 +16,6 @@
 
 package org.springframework.test.context.support;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -34,6 +33,8 @@ import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.ContextConfigurationAttributes;
 import org.springframework.test.context.ContextHierarchy;
+import org.springframework.test.context.NestedTestConfiguration;
+import org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration;
 import org.springframework.test.context.SmartContextLoader;
 import org.springframework.test.util.MetaAnnotationUtils.UntypedAnnotationDescriptor;
 import org.springframework.util.Assert;
@@ -240,8 +241,7 @@ abstract class ContextLoaderUtils {
 		Assert.notNull(testClass, "Class must not be null");
 
 		Class<ContextConfiguration> annotationType = ContextConfiguration.class;
-		MergedAnnotations mergedAnnotations = MergedAnnotations.from(testClass,
-			SearchStrategy.TYPE_HIERARCHY_AND_ENCLOSING_CLASSES);
+		MergedAnnotations mergedAnnotations = MergedAnnotations.from(testClass, getSearchStrategy(testClass));
 		Assert.isTrue(mergedAnnotations.isPresent(annotationType), () -> String.format(
 			"Could not find an 'annotation declaring class' for annotation type [%s] and class [%s]",
 			annotationType.getName(), testClass.getName()));
@@ -250,6 +250,18 @@ abstract class ContextLoaderUtils {
 		mergedAnnotations.stream(annotationType).forEach(mergedAnnotation ->
 				resolveContextConfigurationAttributes(attributesList, mergedAnnotation));
 		return attributesList;
+	}
+
+	private static SearchStrategy getSearchStrategy(Class<?> testClass) {
+		EnclosingConfiguration enclosingConfiguration =
+			MergedAnnotations.from(testClass, SearchStrategy.TYPE_HIERARCHY_AND_ENCLOSING_CLASSES)
+				.stream(NestedTestConfiguration.class)
+				.map(mergedAnnotation -> mergedAnnotation.getEnum("value", EnclosingConfiguration.class))
+				.findFirst()
+				.orElse(EnclosingConfiguration.OVERRIDE);
+		return (enclosingConfiguration == EnclosingConfiguration.INHERIT ?
+				SearchStrategy.TYPE_HIERARCHY_AND_ENCLOSING_CLASSES :
+				SearchStrategy.TYPE_HIERARCHY);
 	}
 
 	private static void resolveContextConfigurationAttributes(List<ContextConfigurationAttributes> attributesList,

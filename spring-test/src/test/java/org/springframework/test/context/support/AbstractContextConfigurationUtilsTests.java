@@ -36,6 +36,8 @@ import org.springframework.test.context.ContextConfigurationAttributes;
 import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.ContextLoader;
 import org.springframework.test.context.MergedContextConfiguration;
+import org.springframework.test.context.NestedTestConfiguration;
+import org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration;
 import org.springframework.test.context.TestContextBootstrapper;
 import org.springframework.test.context.web.WebAppConfiguration;
 
@@ -233,6 +235,7 @@ abstract class AbstractContextConfigurationUtilsTests {
 
 	@ContextConfiguration(classes = FooConfig.class, loader = AnnotationConfigContextLoader.class)
 	@ActiveProfiles("foo")
+	@NestedTestConfiguration(EnclosingConfiguration.INHERIT)
 	static class OuterTestCase {
 
 		class NestedTestCaseWithInheritedConfig {
@@ -254,6 +257,7 @@ abstract class AbstractContextConfigurationUtilsTests {
 		@ContextConfiguration(classes = FooConfig.class, loader = AnnotationConfigContextLoader.class, name = "foo"), //
 		@ContextConfiguration(classes = BarConfig.class, loader = AnnotationConfigContextLoader.class)//
 	})
+	@NestedTestConfiguration(EnclosingConfiguration.INHERIT)
 	static class ContextHierarchyOuterTestCase {
 
 		class NestedTestCaseWithInheritedConfig {
