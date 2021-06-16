@@ -30,6 +30,8 @@ import org.springframework.beans.BeansException;
  * @author Juergen Hoeller
  * @see #setBeanFactory
  * @see #setTargetBeanName
+ *
+ * spring会在每次getBean时创建新的SingletonTargetSource实例
  */
 @SuppressWarnings("serial")
 public class PrototypeTargetSource extends AbstractPrototypeBasedTargetSource {

@@ -141,9 +141,10 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 		if (this.proxyClassLoader == null) {
 			this.proxyClassLoader = ClassUtils.getDefaultClassLoader();
 		}
-
+		//创建一个ProxyFactory 对象
 		ProxyFactory proxyFactory = new ProxyFactory();
 
+		//设置代理工厂要产生的代理的前置通知
 		if (this.preInterceptors != null) {
 			for (Object interceptor : this.preInterceptors) {
 				proxyFactory.addAdvisor(this.advisorAdapterRegistry.wrap(interceptor));
@@ -151,8 +152,10 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 		}
 
 		// Add the main interceptor (typically an Advisor).
+		// 添加一个通知，createMainInterceptor()是一个抽象方法，交给子类实现
 		proxyFactory.addAdvisor(this.advisorAdapterRegistry.wrap(createMainInterceptor()));
 
+		//设置代理工厂要产生的代理的后置通知
 		if (this.postInterceptors != null) {
 			for (Object interceptor : this.postInterceptors) {
 				proxyFactory.addAdvisor(this.advisorAdapterRegistry.wrap(interceptor));
@@ -172,7 +175,7 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 			proxyFactory.setInterfaces(
 					ClassUtils.getAllInterfacesForClass(targetSource.getTargetClass(), this.proxyClassLoader));
 		}
-
+		//产生对象的前置方法，这里是个空方法，子类可以通过实现这个方法来改变proxyFactory的配置
 		postProcessProxyFactory(proxyFactory);
 
 		this.proxy = proxyFactory.getProxy(this.proxyClassLoader);

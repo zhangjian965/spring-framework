@@ -338,6 +338,9 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	 */
 	@Override
 	public final TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
+		// 1.获取当前线程事务
+		// 本方法为抽象方法，具体实现，在本例中为DataSourceTransactionManager
+		// 主要做法是从ThreadLocal中获取当前线程的Connection资源
 		Object transaction = doGetTransaction();
 
 		// Cache debug flag to avoid repeated checks.
@@ -347,22 +350,27 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			// Use defaults if no transaction definition given.
 			definition = new DefaultTransactionDefinition();
 		}
-
+		// 2.如果当前线程已存在事务，则按照事务的传播机制来判断是否使用当前事务
 		if (isExistingTransaction(transaction)) {
 			// Existing transaction found -> check propagation behavior to find out how to behave.
 			return handleExistingTransaction(definition, transaction, debugEnabled);
 		}
 
 		// Check definition settings for new transaction.
+		// 3.查看事务是否已过时，过时则报错
 		if (definition.getTimeout() < TransactionDefinition.TIMEOUT_DEFAULT) {
 			throw new InvalidTimeoutException("Invalid transaction timeout", definition.getTimeout());
 		}
 
 		// No existing transaction found -> check propagation behavior to find out how to proceed.
+		// 4.能运行到这，说明当前线程不存在事务，那么与MANDATORY传播机制就不符合
+		// MANDATORY要求当前线程必须存在事务，故直接抛出异常
 		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_MANDATORY) {
 			throw new IllegalTransactionStateException(
 					"No existing transaction found for transaction marked with propagation 'mandatory'");
 		}
+		// 5.针对于REQUIRED、REQUIRES_NEW、NESTED这三种传播机制
+		// 当前线程之前不存在事务，则目前需要创建新的事务
 		else if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRED ||
 				definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW ||
 				definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NESTED) {
@@ -374,6 +382,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				boolean newSynchronization = (getTransactionSynchronization() != SYNCHRONIZATION_NEVER);
 				DefaultTransactionStatus status = newTransactionStatus(
 						definition, transaction, true, newSynchronization, debugEnabled, suspendedResources);
+				// 5.1 在这里创建新的Connection，本例中默认实现类为DataSourceTransactionManager
 				doBegin(transaction, definition);
 				prepareSynchronization(status, definition);
 				return status;
@@ -405,11 +414,13 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			TransactionDefinition definition, Object transaction, boolean debugEnabled)
 			throws TransactionException {
 
+		// 1.以非事务方式执行，如果当前存在事务，则抛出异常
 		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NEVER) {
 			throw new IllegalTransactionStateException(
 					"Existing transaction found for transaction marked with propagation 'never'");
 		}
 
+		// 2.以非事务方式执行操作，如果当前存在事务，就把当前事务挂起
 		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NOT_SUPPORTED) {
 			if (debugEnabled) {
 				logger.debug("Suspending current transaction");
@@ -419,7 +430,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			return prepareTransactionStatus(
 					definition, null, false, newSynchronization, debugEnabled, suspendedResources);
 		}
-
+		// 3.新建事务，如果当前存在事务，把当前事务挂起
 		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW) {
 			if (debugEnabled) {
 				logger.debug("Suspending current transaction, creating new transaction with name [" +
@@ -443,7 +454,8 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				throw beginErr;
 			}
 		}
-
+		// 4.支持当前事务，如果当前事务存在，则执行一个嵌套事务，如果当前没有事务，就新建一个事务
+		// 嵌套事务独立于之前的线程事务进行提交或回滚
 		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NESTED) {
 			if (!isNestedTransactionAllowed()) {
 				throw new NestedTransactionNotSupportedException(
@@ -714,6 +726,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			if (defStatus.isDebug()) {
 				logger.debug("Transactional code has requested rollback");
 			}
+			// 如果已经被标记回滚，则不会提交事务，直接回滚
 			processRollback(defStatus);
 			return;
 		}

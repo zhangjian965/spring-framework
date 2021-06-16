@@ -35,6 +35,8 @@ import org.springframework.aop.TargetSource;
  * @since 2.0
  * @see #requiresRefresh()
  * @see #freshTarget()
+ *
+ * 可刷新的目标源。此类实现可根据配置的刷新延迟时间,在每次获取目标对象时自动刷新目标对象
  */
 public abstract class AbstractRefreshableTargetSource implements TargetSource, Refreshable {
 

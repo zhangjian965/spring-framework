@@ -33,6 +33,8 @@ public interface ClassFilter {
 	 * Should the pointcut apply to the given interface or target class?
 	 * @param clazz the candidate target class
 	 * @return whether the advice should apply to the given target class
+	 * 当前类过滤器是否与指定的类型匹配，
+	 * 如果匹配，则需要把自身内部持有的Advice应用的目标类上。
 	 */
 	boolean matches(Class<?> clazz);
 

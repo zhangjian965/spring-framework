@@ -85,6 +85,8 @@ public class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisito
 	public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
 		String className = Type.getType(desc).getClassName();
 		this.annotationSet.add(className);
+		// metaAnnotationMap当做构造参数传入了 AnnotationAttributesReadingVisitor 对象中，
+		// metaAnnotationMap会在这里面完成赋值
 		return new AnnotationAttributesReadingVisitor(
 				className, this.attributesMap, this.metaAnnotationMap, this.classLoader);
 	}

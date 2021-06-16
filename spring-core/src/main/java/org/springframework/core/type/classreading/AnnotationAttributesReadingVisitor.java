@@ -58,6 +58,7 @@ final class AnnotationAttributesReadingVisitor extends RecursiveAnnotationAttrib
 	}
 
 
+
 	@Override
 	public void visitEnd() {
 		super.visitEnd();
@@ -71,10 +72,12 @@ final class AnnotationAttributesReadingVisitor extends RecursiveAnnotationAttrib
 			else {
 				attributeList.add(0, this.attributes);
 			}
+			// 将会排除 java.lang.annotation 下的注解，
 			if (!AnnotationUtils.isInJavaLangAnnotationPackage(annotationClass.getName())) {
 				Set<Annotation> visited = new LinkedHashSet<Annotation>();
 				Annotation[] metaAnnotations = AnnotationUtils.getAnnotations(annotationClass);
 				if (!ObjectUtils.isEmpty(metaAnnotations)) {
+					// 然后通过递归调用 recursivelyCollectMetaAnnotations获取元注解，
 					for (Annotation metaAnnotation : metaAnnotations) {
 						recursivelyCollectMetaAnnotations(visited, metaAnnotation);
 					}
@@ -84,6 +87,7 @@ final class AnnotationAttributesReadingVisitor extends RecursiveAnnotationAttrib
 					for (Annotation ann : visited) {
 						metaAnnotationTypeNames.add(ann.annotationType().getName());
 					}
+					// 不断将元注解置入 metaAnnotationMap中
 					this.metaAnnotationMap.put(annotationClass.getName(), metaAnnotationTypeNames);
 				}
 			}

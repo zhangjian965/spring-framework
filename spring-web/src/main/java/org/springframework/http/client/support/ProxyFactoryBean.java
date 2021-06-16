@@ -25,7 +25,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * {@link FactoryBean} that creates a {@link Proxy java.net.Proxy}.
+ * {@link  } that creates a {@link Proxy java.net.Proxy}.
  *
  * @author Arjen Poutsma
  * @since 3.0.4

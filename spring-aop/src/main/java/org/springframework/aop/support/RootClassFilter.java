@@ -38,6 +38,7 @@ public class RootClassFilter implements ClassFilter, Serializable {
 
 	@Override
 	public boolean matches(Class<?> candidate) {
+		//通过判断目标类是否是指定类型（或其子类型），决定是否匹配
 		return this.clazz.isAssignableFrom(candidate);
 	}
 

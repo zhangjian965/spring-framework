@@ -136,11 +136,14 @@ class ConfigurationClassBeanDefinitionReader {
 		if (configClass.isImported()) {
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
+		// 判断当前的bean中是否含有@Bean注解的方法，如果有，需要把这些方法产生的bean放入到BeanDefinitionMap当中
 		for (BeanMethod beanMethod : configClass.getBeanMethods()) {
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
 
 		loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
+		// 如果bean上存在@Import注解，且import的是一个实现了ImportBeanDefinitionRegistrar接口,
+		// 则执行ImportBeanDefinitionRegistrar的registerBeanDefinitions()方法
 		loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());
 	}
 

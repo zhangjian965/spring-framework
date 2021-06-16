@@ -29,6 +29,8 @@ import org.springframework.util.StringUtils;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 2.0
+ *
+ * 基于AspectJ的类型匹配实现
  */
 public class TypePatternClassFilter implements ClassFilter {
 

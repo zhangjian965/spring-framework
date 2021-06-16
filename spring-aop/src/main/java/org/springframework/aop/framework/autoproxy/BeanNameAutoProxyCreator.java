@@ -82,6 +82,7 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 					}
 					mappedName = mappedName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());
 				}
+				// 判断beanName是否与配置的值匹配
 				if (isMatch(beanName, mappedName)) {
 					return PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS;
 				}
@@ -89,6 +90,7 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 				if (beanFactory != null) {
 					String[] aliases = beanFactory.getAliases(beanName);
 					for (String alias : aliases) {
+						// 用别名去判断
 						if (isMatch(alias, mappedName)) {
 							return PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS;
 						}
@@ -96,6 +98,7 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 				}
 			}
 		}
+		// 都不匹配，那不需要生成代理了
 		return DO_NOT_PROXY;
 	}
 

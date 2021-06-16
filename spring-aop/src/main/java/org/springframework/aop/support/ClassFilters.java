@@ -85,6 +85,7 @@ public abstract class ClassFilters {
 
 	/**
 	 * ClassFilter implementation for a union of the given ClassFilters.
+	 * 支持以或的逻辑组合多个ClassFilter
 	 */
 	@SuppressWarnings("serial")
 	private static class UnionClassFilter implements ClassFilter, Serializable {
@@ -120,6 +121,7 @@ public abstract class ClassFilters {
 
 	/**
 	 * ClassFilter implementation for an intersection of the given ClassFilters.
+	 * 支持以与的逻辑组合多个ClassFilter
 	 */
 	@SuppressWarnings("serial")
 	private static class IntersectionClassFilter implements ClassFilter, Serializable {

@@ -57,6 +57,7 @@ public interface AnnotatedTypeMetadata {
 	 * @return a Map of attributes, with the attribute name as key (e.g. "value")
 	 * and the defined attribute value as Map value. This return value will be
 	 * {@code null} if no matching annotation is defined.
+	 * 取得指定类型注解的所有的属性
 	 */
 	Map<String, Object> getAnnotationAttributes(String annotationName);
 
@@ -72,6 +73,7 @@ public interface AnnotatedTypeMetadata {
 	 * @return a Map of attributes, with the attribute name as key (e.g. "value")
 	 * and the defined attribute value as Map value. This return value will be
 	 * {@code null} if no matching annotation is defined.
+	 * classValuesAsString：若是true表示 Class用它的字符串的全类名来表示。这样可以避免Class被提前加载
 	 */
 	Map<String, Object> getAnnotationAttributes(String annotationName, boolean classValuesAsString);
 

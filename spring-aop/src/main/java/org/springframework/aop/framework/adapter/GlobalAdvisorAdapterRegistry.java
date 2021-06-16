@@ -23,16 +23,19 @@ package org.springframework.aop.framework.adapter;
  * @author Juergen Hoeller
  * @author Phillip Webb
  * @see DefaultAdvisorAdapterRegistry
+ * 抽象类，不能被实例化，保证instance对象的唯一性
  */
 public abstract class GlobalAdvisorAdapterRegistry {
 
 	/**
 	 * Keep track of a single instance so we can return it to classes that request it.
+	 * 配置一个静态的final变量instance，使得对象在加载类的时候就生成了
 	 */
 	private static AdvisorAdapterRegistry instance = new DefaultAdvisorAdapterRegistry();
 
 	/**
 	 * Return the singleton {@link DefaultAdvisorAdapterRegistry} instance.
+	 * 使用instance对象时，通过静态方法getInstance方法完成，保证instance唯一对象的获取
 	 */
 	public static AdvisorAdapterRegistry getInstance() {
 		return instance;

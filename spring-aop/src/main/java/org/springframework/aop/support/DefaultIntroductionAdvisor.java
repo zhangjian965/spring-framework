@@ -142,8 +142,10 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
 		return this;
 	}
 
+
 	@Override
 	public boolean matches(Class<?> clazz) {
+		//它的作用是给所有bean追加指定接口
 		return true;
 	}
 

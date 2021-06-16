@@ -38,6 +38,8 @@ import org.springframework.aop.TargetSource;
  * @since 1.2.4
  * @see #isInitialized()
  * @see #createObject()
+ *
+ * 此类实现在调用getTarget()获取时才创建目标对象
  */
 public abstract class AbstractLazyCreationTargetSource implements TargetSource {
 

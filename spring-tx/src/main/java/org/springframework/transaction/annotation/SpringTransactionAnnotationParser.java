@@ -54,17 +54,23 @@ public class SpringTransactionAnnotationParser implements TransactionAnnotationP
 		return parseTransactionAnnotation(AnnotationUtils.getAnnotationAttributes(ann, false, false));
 	}
 
+	// 解析@Transectional注解中的元素
 	protected TransactionAttribute parseTransactionAnnotation(AnnotationAttributes attributes) {
+		// 创建一个RuleBasedTransactionAttribute对象
 		RuleBasedTransactionAttribute rbta = new RuleBasedTransactionAttribute();
-
+		// 传播行为
 		Propagation propagation = attributes.getEnum("propagation");
 		rbta.setPropagationBehavior(propagation.value());
+		// 隔离级别
 		Isolation isolation = attributes.getEnum("isolation");
 		rbta.setIsolationLevel(isolation.value());
+		// 超时
 		rbta.setTimeout(attributes.getNumber("timeout").intValue());
+		// 是否只读
 		rbta.setReadOnly(attributes.getBoolean("readOnly"));
 		rbta.setQualifier(attributes.getString("value"));
 
+		// 设置当发生异常时，触发回滚的类
 		List<RollbackRuleAttribute> rollbackRules = new ArrayList<RollbackRuleAttribute>();
 		for (Class<?> rbRule : attributes.getClassArray("rollbackFor")) {
 			rollbackRules.add(new RollbackRuleAttribute(rbRule));
@@ -72,6 +78,7 @@ public class SpringTransactionAnnotationParser implements TransactionAnnotationP
 		for (String rbRule : attributes.getStringArray("rollbackForClassName")) {
 			rollbackRules.add(new RollbackRuleAttribute(rbRule));
 		}
+		// 当遇到这些异常时不进行回滚
 		for (Class<?> rbRule : attributes.getClassArray("noRollbackFor")) {
 			rollbackRules.add(new NoRollbackRuleAttribute(rbRule));
 		}

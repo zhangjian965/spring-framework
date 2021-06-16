@@ -66,6 +66,9 @@ public class ExposeInvocationInterceptor implements MethodInterceptor, PriorityO
 	 * @return the invocation object associated with the current invocation
 	 * @throws IllegalStateException if there is no AOP invocation in progress,
 	 * or if the ExposeInvocationInterceptor was not added to this interceptor chain
+	 *
+	 * ExposeInvocationInterceptor就是用来传递MethodInvocation的。在后续的任何下调用链环节，
+	 * 只要需要用到当前的MethodInvocation就通过ExposeInvocationInterceptor.currentInvocation()静态方法获得
 	 */
 	public static MethodInvocation currentInvocation() throws IllegalStateException {
 		MethodInvocation mi = invocation.get();

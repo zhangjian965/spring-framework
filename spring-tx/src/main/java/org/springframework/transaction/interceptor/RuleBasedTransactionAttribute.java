@@ -41,9 +41,11 @@ import org.apache.commons.logging.LogFactory;
 public class RuleBasedTransactionAttribute extends DefaultTransactionAttribute implements Serializable {
 
 	/** Prefix for rollback-on-exception rules in description strings */
+	// - 表示抛出该异常时需要回滚
 	public static final String PREFIX_ROLLBACK_RULE = "-";
 
 	/** Prefix for commit-on-exception rules in description strings */
+	// +表示即使抛出该异常事务同样要提交
 	public static final String PREFIX_COMMIT_RULE = "+";
 
 
@@ -134,7 +136,11 @@ public class RuleBasedTransactionAttribute extends DefaultTransactionAttribute i
 		RollbackRuleAttribute winner = null;
 		int deepest = Integer.MAX_VALUE;
 
+		//配置文件中的回滚异常列表
 		if (this.rollbackRules != null) {
+			//原理，根据这个类的继承深度来判断谁更符合异常
+			//使用抛出exception的className(全路径className)进行indexOf match
+			//如果没有match上会继续搜索superClass name进行match，到Throwable class为止
 			for (RollbackRuleAttribute rule : this.rollbackRules) {
 				int depth = rule.getDepth(ex);
 				if (depth >= 0 && depth < deepest) {

@@ -28,6 +28,9 @@ package org.springframework.aop;
  * @author Rod Johnson
  * @since 04.04.2003
  * @see IntroductionInterceptor
+ * Advisor分两大类
+ * 1.IntroductionAdvisor要为了给targetClass追加接口（或者说追加更多的方法），这种增强属于类级别的增强
+ * 2.PointcutAdvisor主要为了拦截方法，这种增强属于方法级别的增强
  */
 public interface IntroductionAdvisor extends Advisor, IntroductionInfo {
 

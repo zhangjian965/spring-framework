@@ -50,6 +50,8 @@ final class SimpleMetadataReader implements MetadataReader {
 		InputStream is = new BufferedInputStream(resource.getInputStream());
 		ClassReader classReader;
 		try {
+			// Class 文件中包含类的所有信息，如接口，字段属性，方法，在内部这些信息按照一定规则紧凑排序。
+			// ASM 框会以文件流的形式读取 class 文件
 			classReader = new ClassReader(is);
 		}
 		catch (IllegalArgumentException ex) {
@@ -60,7 +62,9 @@ final class SimpleMetadataReader implements MetadataReader {
 			is.close();
 		}
 
+		// 解析过程中使用观察者模式（Visitor），当解析器碰到相应的信息委托给观察者（Visitor）
 		AnnotationMetadataReadingVisitor visitor = new AnnotationMetadataReadingVisitor(classLoader);
+		// 使用 ClassReader#accpet 接受 ClassVisitor
 		classReader.accept(visitor, ClassReader.SKIP_DEBUG);
 
 		this.annotationMetadata = visitor;

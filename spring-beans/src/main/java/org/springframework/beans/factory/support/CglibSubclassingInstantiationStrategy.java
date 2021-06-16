@@ -130,6 +130,7 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 			// SPR-10785: set callbacks directly on the instance instead of in the
 			// enhanced class (via the Enhancer) in order to avoid memory leaks.
 			Factory factory = (Factory) instance;
+			// 设置多个拦截器
 			factory.setCallbacks(new Callback[] {NoOp.INSTANCE,
 					new LookupOverrideMethodInterceptor(this.beanDefinition, this.owner),
 					new ReplaceOverrideMethodInterceptor(this.beanDefinition, this.owner)});
@@ -148,6 +149,7 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 				ClassLoader cl = ((ConfigurableBeanFactory) this.owner).getBeanClassLoader();
 				enhancer.setStrategy(new ClassLoaderAwareGeneratorStrategy(cl));
 			}
+			//可通过过滤器(CallbackFilter)返回的多个拦截器的数组下标值(int)，确定使用哪个拦截器。
 			enhancer.setCallbackFilter(new MethodOverrideCallbackFilter(beanDefinition));
 			enhancer.setCallbackTypes(CALLBACK_TYPES);
 			return enhancer.createClass();
@@ -282,9 +284,11 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 			LookupOverride lo = (LookupOverride) getBeanDefinition().getMethodOverrides().getOverride(method);
 			Object[] argsToUse = (args.length > 0 ? args : null);  // if no-arg, don't insist on args at all
 			if (StringUtils.hasText(lo.getBeanName())) {
+				// 到容器中，通过xml配置的bean name去查找依赖的prototype对象
 				return this.owner.getBean(lo.getBeanName(), argsToUse);
 			}
 			else {
+				// 到容器中，通过方法的返回类型去查找依赖的prototype对象
 				return this.owner.getBean(method.getReturnType(), argsToUse);
 			}
 		}

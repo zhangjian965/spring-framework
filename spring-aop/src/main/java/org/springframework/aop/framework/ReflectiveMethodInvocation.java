@@ -153,10 +153,12 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	@Override
 	public Object proceed() throws Throwable {
 		// We start with an index of -1 and increment early.
+		// 拦截器链中的最后一个拦截器执行完后，即可执行目标方法
+		//	1.业务方法调用
 		if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
 			return invokeJoinpoint();
 		}
-
+		// 2.如果还有其他intercept，则先调用
 		Object interceptorOrInterceptionAdvice =
 				this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
 		if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) {
@@ -165,11 +167,13 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 			InterceptorAndDynamicMethodMatcher dm =
 					(InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;
 			if (dm.methodMatcher.matches(this.method, this.targetClass, this.arguments)) {
+				// 调用拦截器逻辑
 				return dm.interceptor.invoke(this);
 			}
 			else {
 				// Dynamic matching failed.
 				// Skip this interceptor and invoke the next in the chain.
+				// 如果匹配失败，则忽略当前的拦截器
 				return proceed();
 			}
 		}

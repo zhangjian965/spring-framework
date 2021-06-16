@@ -46,6 +46,13 @@ import org.springframework.util.ObjectUtils;
  * @see PrototypeTargetSource
  * @see ThreadLocalTargetSource
  * @see CommonsPool2TargetSource
+ *
+ * AbstractBeanFactoryBasedTargetSource: 此类目标源基于IoC容器实现,也就是说target目标对象可以通过beanName从容器中获取。
+ * 此类又扩展出:
+ * (1)SimpleBeanTargetSource:简单实现,直接调用getBean从容器获取目标对象;
+ * (2)LazyInitTargetSource:延迟初始化目标源,子类可重写postProcessTargetObject方法后置处理目标对象;
+ * (3)AbstractPrototypeBasedTargetSource:原型bean目标源,此抽象类可确保beanName对应的bean的scope属性为prototype。
+ * 其子类做了简单原型、池化原型、线程隔离原型这3种实现
  */
 public abstract class AbstractBeanFactoryBasedTargetSource implements TargetSource, BeanFactoryAware, Serializable {
 

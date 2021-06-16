@@ -102,6 +102,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * @see #refresh
 	 */
 	public GenericApplicationContext() {
+		// 初始化一个beanFactory
 		this.beanFactory = new DefaultListableBeanFactory();
 	}
 
@@ -311,7 +312,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	@Override
 	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
 			throws BeanDefinitionStoreException {
-
+		// 一开始构造函数就初始化了DefaultListableBeanFactory
 		this.beanFactory.registerBeanDefinition(beanName, beanDefinition);
 	}
 

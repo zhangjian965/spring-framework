@@ -264,9 +264,11 @@ class ConfigurationClassParser {
 			throws IOException {
 
 		// Recursively process any member (nested) classes first
+		// 首先处理内部类，处理内部类时，最终还是调用doProcessConfigurationClass()方法
 		processMemberClasses(configClass, sourceClass);
 
 		// Process any @PropertySource annotations
+		// 处理属性资源文件，加了@PropertySource注解。
 		for (AnnotationAttributes propertySource : AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), PropertySources.class,
 				org.springframework.context.annotation.PropertySource.class)) {
@@ -280,6 +282,9 @@ class ConfigurationClassParser {
 		}
 
 		// Process any @ComponentScan annotations
+		// 首先解析出类上的@ComponentScan和@ComponentScans注解，然后根据配置的扫描包路径,利用ASM技术
+		// (ASM技术是一种操作字节码的技术，有兴趣的朋友可以去网上了解下)扫描出所有需要交给Spring管理的类，
+		// 由于扫描出的类中可能也被加了@ComponentScan和@ComponentScans注解，因此需要进行递归解析，直到所有加了这两个注解的类被解析完成。
 		Set<AnnotationAttributes> componentScans = AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), ComponentScans.class, ComponentScan.class);
 		if (!componentScans.isEmpty() &&
@@ -302,9 +307,13 @@ class ConfigurationClassParser {
 		}
 
 		// Process any @Import annotations
+		// 处理@Import注解。通过@Import注解，有三种方式可以将一个Bean注册到Spring容器中。
+		// 处理Import注解注册的bean，这一步只会将import注册的bean变为ConfigurationClass,不会变成BeanDefinition
+		//而是在loadBeanDefinitions()方法中变成BeanDefinition，再放入到BeanDefinitionMap中
 		processImports(configClass, sourceClass, getImports(sourceClass), true);
 
 		// Process any @ImportResource annotations
+		// 处理@ImportResource注解，解析配置文件
 		if (sourceClass.getMetadata().isAnnotated(ImportResource.class.getName())) {
 			AnnotationAttributes importResource =
 					AnnotationConfigUtils.attributesFor(sourceClass.getMetadata(), ImportResource.class);
@@ -317,15 +326,20 @@ class ConfigurationClassParser {
 		}
 
 		// Process individual @Bean methods
+		// 处理加了@Bean注解的方法。
 		Set<MethodMetadata> beanMethods = retrieveBeanMethodMetadata(sourceClass);
 		for (MethodMetadata methodMetadata : beanMethods) {
 			configClass.addBeanMethod(new BeanMethod(methodMetadata, configClass));
 		}
 
 		// Process default methods on interfaces
+		// 通过processInterfaces()处理接口的默认方法，从JDK8开始，接口中的方法可以有自己的默认实现，
+		// 因此，如果这个接口中的方法也加了@Bean注解，也需要被解析。(很少用)
 		processInterfaces(configClass, sourceClass);
 
 		// Process superclass, if any
+		// 解析父类，如果被解析的配置类继承了某个类，那么配置类的父类也会被进行解析doProcessConfigurationClass()
+		// (父类是JDK内置的类例外，即全类名以java开头的)
 		if (sourceClass.getMetadata().hasSuperClass()) {
 			String superclass = sourceClass.getMetadata().getSuperClassName();
 			if (!superclass.startsWith("java") && !this.knownSuperclasses.containsKey(superclass)) {

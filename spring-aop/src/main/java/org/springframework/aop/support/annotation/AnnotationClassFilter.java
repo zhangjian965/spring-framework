@@ -61,6 +61,7 @@ public class AnnotationClassFilter implements ClassFilter {
 
 	@Override
 	public boolean matches(Class<?> clazz) {
+		//通过检查目标类是否存在指定的注解，决定是否匹配
 		return (this.checkInherited ?
 				(AnnotationUtils.findAnnotation(clazz, this.annotationType) != null) :
 				clazz.isAnnotationPresent(this.annotationType));

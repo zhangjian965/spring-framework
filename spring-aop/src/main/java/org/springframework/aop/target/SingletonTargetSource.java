@@ -34,6 +34,9 @@ import org.springframework.util.ObjectUtils;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see org.springframework.aop.framework.AdvisedSupport#setTarget(Object)
+ *
+ * 静态目标源,单例目标源。Spring的AOP框架默认为受IoC容器管理的bean创建此目标源。
+ * 换句话说,SingletonTargetSource、proxy与目标bean三者的声明周期均相同
  */
 public class SingletonTargetSource implements TargetSource, Serializable {
 

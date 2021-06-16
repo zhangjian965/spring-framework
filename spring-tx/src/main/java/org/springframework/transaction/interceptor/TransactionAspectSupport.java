@@ -268,28 +268,36 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			throws Throwable {
 
 		// If the transaction attribute is null, the method is non-transactional.
+		// 1.获取该方法的事务属性
 		final TransactionAttribute txAttr = getTransactionAttributeSource().getTransactionAttribute(method, targetClass);
+		// 2.查找容器中的PlatformTransactionManager，用于管理事务
 		final PlatformTransactionManager tm = determineTransactionManager(txAttr);
+		// 3.获取被代理的类方法名称
 		final String joinpointIdentification = methodIdentification(method, targetClass, txAttr);
-
+		// 4.声明式事务的操作
 		if (txAttr == null || !(tm instanceof CallbackPreferringPlatformTransactionManager)) {
 			// Standard transaction demarcation with getTransaction and commit/rollback calls.
+			//4.1 创建TransactionInfo（重要操作在这里）
 			TransactionInfo txInfo = createTransactionIfNecessary(tm, txAttr, joinpointIdentification);
 
 			Object retVal;
 			try {
 				// This is an around advice: Invoke the next interceptor in the chain.
 				// This will normally result in a target object being invoked.
+				// 4.2 先执行其他Interceptor，执行完毕之后执行被代理类的方法
 				retVal = invocation.proceedWithInvocation();
 			}
 			catch (Throwable ex) {
 				// target invocation exception
+				// 4.3 执行业务报错，回滚事务
 				completeTransactionAfterThrowing(txInfo, ex);
 				throw ex;
 			}
 			finally {
+				// 4.4 清理事务状态
 				cleanupTransactionInfo(txInfo);
 			}
+			// 4.5 业务执行成功，提交事务
 			commitTransactionAfterReturning(txInfo);
 			return retVal;
 		}
@@ -535,6 +543,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 				logger.trace("Completing transaction for [" + txInfo.getJoinpointIdentification() +
 						"] after exception: " + ex);
 			}
+			// 判断回滚的默认依据是 抛出的异常是否是RuntimeException或者ERROR类型
 			if (txInfo.transactionAttribute.rollbackOn(ex)) {
 				try {
 					txInfo.getTransactionManager().rollback(txInfo.getTransactionStatus());
@@ -553,6 +562,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 					throw err;
 				}
 			}
+			// 如果不是，则提交事务
 			else {
 				// We don't roll back on this exception.
 				// Will still roll back if TransactionStatus.isRollbackOnly() is true.

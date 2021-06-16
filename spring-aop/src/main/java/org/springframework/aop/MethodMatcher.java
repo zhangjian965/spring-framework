@@ -57,6 +57,8 @@ public interface MethodMatcher {
 	 * @param targetClass the target class (may be {@code null}, in which case
 	 * the candidate class must be taken to be the method's declaring class)
 	 * @return whether or not this method matches statically
+	 *
+	 * 调用具有两个参数（2-args）的 matches 方法用于静态匹配
 	 */
 	boolean matches(Method method, Class<?> targetClass);
 
@@ -86,6 +88,8 @@ public interface MethodMatcher {
 	 * @param args arguments to the method
 	 * @return whether there's a runtime match
 	 * @see MethodMatcher#matches(Method, Class)
+	 *
+	 * 调用具有三个参数（3-args）的 matches 方法动态匹配目标方法
 	 */
 	boolean matches(Method method, Class<?> targetClass, Object... args);
 

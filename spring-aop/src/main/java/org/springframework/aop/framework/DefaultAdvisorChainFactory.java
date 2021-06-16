@@ -61,10 +61,14 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 			if (advisor instanceof PointcutAdvisor) {
 				// Add it conditionally.
 				PointcutAdvisor pointcutAdvisor = (PointcutAdvisor) advisor;
+				// 调用 ClassFilter 对 bean 类型进行匹配，无法匹配则说明当前通知器,不适合应用在当前 bean上
 				if (config.isPreFiltered() || pointcutAdvisor.getPointcut().getClassFilter().matches(actualClass)) {
 					MethodMatcher mm = pointcutAdvisor.getPointcut().getMethodMatcher();
+					// 通过方法匹配器对目标方法进行匹配
 					if (MethodMatchers.matches(mm, method, actualClass, hasIntroductions)) {
+						// 将 advisor 中的 advice 转成相应的拦截器
 						MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
+						// 若 isRuntime 返回 true，则表明 MethodMatcher 要在运行时做一些检测
 						if (mm.isRuntime()) {
 							// Creating a new object instance in the getInterceptors() method
 							// isn't a problem as we normally cache created chains.
@@ -78,6 +82,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 					}
 				}
 			}
+			// IntroductionAdvisor 类型的通知器，仅需进行类级别的匹配即可
 			else if (advisor instanceof IntroductionAdvisor) {
 				IntroductionAdvisor ia = (IntroductionAdvisor) advisor;
 				if (config.isPreFiltered() || ia.getClassFilter().matches(actualClass)) {

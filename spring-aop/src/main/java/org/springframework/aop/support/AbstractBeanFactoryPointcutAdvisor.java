@@ -38,6 +38,7 @@ import org.springframework.util.Assert;
  * @since 2.0.2
  * @see #setAdviceBeanName
  * @see DefaultBeanFactoryPointcutAdvisor
+ * 和bean工厂有关的PointcutAdvisor。若在Bean容器里注册可议注入BeanFactory~~~从而访问里面的实例
  */
 @SuppressWarnings("serial")
 public abstract class AbstractBeanFactoryPointcutAdvisor extends AbstractPointcutAdvisor implements BeanFactoryAware {
@@ -102,8 +103,9 @@ public abstract class AbstractBeanFactoryPointcutAdvisor extends AbstractPointcu
 		if (advice != null || this.adviceBeanName == null) {
 			return advice;
 		}
-
+		// 显然进来Spring容器环境了，bean工厂是不能为null的
 		Assert.state(this.beanFactory != null, "BeanFactory must be set to resolve 'adviceBeanName'");
+		// 若bean是单例的  那就没什么好说的  直接去工厂里拿出来就完事了（Advice.class）  有可能返回null哦
 		if (this.beanFactory.isSingleton(this.adviceBeanName)) {
 			// Rely on singleton semantics provided by the factory.
 			advice = this.beanFactory.getBean(this.adviceBeanName, Advice.class);
@@ -114,6 +116,7 @@ public abstract class AbstractBeanFactoryPointcutAdvisor extends AbstractPointcu
 			// No singleton guarantees from the factory -> let's lock locally but
 			// reuse the factory's singleton lock, just in case a lazy dependency
 			// of our advice bean happens to trigger the singleton lock implicitly...
+			// 若是多例的，就加锁，然后调用getBean()给他生成一个新的实例即可
 			synchronized (this.adviceMonitor) {
 				if (this.advice == null) {
 					this.advice = this.beanFactory.getBean(this.adviceBeanName, Advice.class);

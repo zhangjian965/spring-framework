@@ -22,6 +22,10 @@ package org.springframework.aop;
  * for which method-level matching doesn't apply.
  *
  * @author Rod Johnson
+ *
+ * Advisor分两大类
+ * 1.IntroductionAdvisor要为了给targetClass追加接口（或者说追加更多的方法），这种增强属于类级别的增强
+ * 2.PointcutAdvisor主要为了拦截方法，这种增强属于方法级别的增强
  */
 public interface PointcutAdvisor extends Advisor {
 

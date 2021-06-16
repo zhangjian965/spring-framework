@@ -34,6 +34,8 @@ import org.springframework.util.Assert;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
+ *
+ * 动态目标源,支持热替换的目标源,支持spring应用运行时替换目标对象。 
  */
 public class HotSwappableTargetSource implements TargetSource, Serializable {
 

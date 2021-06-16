@@ -52,6 +52,7 @@ public interface ClassMetadata {
 	/**
 	 * Return whether the underlying class represents a concrete class,
 	 * i.e. neither an interface nor an abstract class.
+	 * 是否允许创建,不是接口且不是抽象类,这里就返回true了
 	 */
 	boolean isConcrete();
 
@@ -64,6 +65,7 @@ public interface ClassMetadata {
 	 * Determine whether the underlying class is independent, i.e. whether
 	 * it is a top-level class or a nested class (static inner class) that
 	 * can be constructed independently from an enclosing class.
+	 * 是否是独立的(能够创建对象的)  比如是Class、或者内部类、静态内部类
 	 */
 	boolean isIndependent();
 
@@ -73,6 +75,7 @@ public interface ClassMetadata {
 	 * local class within a method).
 	 * <p>If this method returns {@code false}, then the underlying
 	 * class is a top-level class.
+	 * 是否有内部类之类的东东
 	 */
 	boolean hasEnclosingClass();
 
@@ -96,6 +99,7 @@ public interface ClassMetadata {
 	/**
 	 * Return the names of all interfaces that the underlying class
 	 * implements, or an empty array if there are none.
+	 * 会把实现的所有接口名称都返回  具体依赖于Class#getSuperclass
 	 */
 	String[] getInterfaceNames();
 
@@ -106,6 +110,7 @@ public interface ClassMetadata {
 	 * inherited classes and interfaces. An empty array is returned if no member classes
 	 * or interfaces exist.
 	 * @since 3.1
+	 * 基于：Class#getDeclaredClasses  返回类中定义的公共、私有、保护的内部类
 	 */
 	String[] getMemberClassNames();
 

@@ -94,6 +94,7 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 		}
 
 		// First, see if we have a cached value.
+		// 1.查询缓存中是否存在
 		Object cacheKey = getCacheKey(method, targetClass);
 		TransactionAttribute cached = this.attributeCache.get(cacheKey);
 		if (cached != null) {
@@ -108,6 +109,7 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 		}
 		else {
 			// We need to work it out.
+			// 2.获取方法上的事务配置属性
 			TransactionAttribute txAttr = computeTransactionAttribute(method, targetClass);
 			// Put it in the cache.
 			if (txAttr == null) {
@@ -148,6 +150,8 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 	 */
 	protected TransactionAttribute computeTransactionAttribute(Method method, Class<?> targetClass) {
 		// Don't allow no-public methods as required.
+		// 1.注意这里，如果被代理方法非public类型，则直接返回空
+		// 暂时不支持非public类型方法
 		if (allowPublicMethodsOnly() && !Modifier.isPublic(method.getModifiers())) {
 			return null;
 		}
@@ -161,12 +165,14 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 		specificMethod = BridgeMethodResolver.findBridgedMethod(specificMethod);
 
 		// First try is the method in the target class.
+		// 2.解析方法上的@Transactional属性
 		TransactionAttribute txAttr = findTransactionAttribute(specificMethod);
 		if (txAttr != null) {
 			return txAttr;
 		}
 
 		// Second try is the transaction attribute on the target class.
+		// 3.如果方法上没有事务属性，就从类上来获取
 		txAttr = findTransactionAttribute(specificMethod.getDeclaringClass());
 		if (txAttr != null && ClassUtils.isUserLevelMethod(method)) {
 			return txAttr;

@@ -49,6 +49,11 @@ import org.springframework.util.CollectionUtils;
  * @author Stephane Nicoll
  * @author Juergen Hoeller
  * @since 4.2
+ *
+ * 这个后置处理器, 主要是处理 @EventListener 注解的.
+ * 1. 解析 @EventListener , 获取拦截方法
+ * 2. 对拦截方法进行转换, 变成 ApplicationListener
+ * 3. 将转换的 ApplicationListener, 放到spring容器中
  */
 public class EventListenerMethodProcessor implements SmartInitializingSingleton, ApplicationContextAware {
 
@@ -126,6 +131,7 @@ public class EventListenerMethodProcessor implements SmartInitializingSingleton,
 		if (!this.nonAnnotatedClasses.contains(targetType)) {
 			Map<Method, EventListener> annotatedMethods = null;
 			try {
+				//获取标注了 @EventListener 注解的监听方法
 				annotatedMethods = MethodIntrospector.selectMethods(targetType,
 						new MethodIntrospector.MetadataLookup<EventListener>() {
 							@Override
@@ -153,12 +159,14 @@ public class EventListenerMethodProcessor implements SmartInitializingSingleton,
 						if (factory.supportsMethod(method)) {
 							Method methodToUse = AopUtils.selectInvocableMethod(
 									method, this.applicationContext.getType(beanName));
+							//为监听方法创建 ApplicationListener
 							ApplicationListener<?> applicationListener =
 									factory.createApplicationListener(beanName, targetType, methodToUse);
 							if (applicationListener instanceof ApplicationListenerMethodAdapter) {
 								((ApplicationListenerMethodAdapter) applicationListener)
 										.init(this.applicationContext, this.evaluator);
 							}
+							//将创建的 ApplicationListener 加入到容器中
 							this.applicationContext.addApplicationListener(applicationListener);
 							break;
 						}
